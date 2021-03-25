@@ -1,0 +1,30 @@
+{
+    "projects": [
+        {
+            "name": "projekt1",
+            "company": {
+                "name": "nokija",
+                "link": "www.nokija.com",
+                "logo": "test.png"
+            },
+            "state": {
+                "states":["free", "initial reservation", "final reservation"],
+                "currentState": "free"
+            },
+            "additionalData": "some things from company"
+        },
+        {
+            "name": "projekt2",
+            "company": {
+                "name": "komar",
+                "link": "www.komar.com",
+                "logo": "test2.png"
+            },
+            "state": {
+                "states":["free", "initial reservation", "final reservation"],
+                "currentState": "free"
+            },
+            "additionalData": "some things from company 2"
+        }
+    ]
+}
