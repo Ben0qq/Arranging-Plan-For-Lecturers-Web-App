@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import Login from './components/login';
 
 function App() {
-  const [responseFromApi] = useState({})
+  const [setResponse] = useState({})
 
   const fetchData = async() => {
     fetch('/api/hello')
@@ -19,11 +20,10 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <a style={{ fontSize: 24 }}>
-        Msg from API: <span style={{ color: 'red' }}>{responseFromApi.header}</span>
-        </a>
-      </header>
+        <h2>
+          Super aplikacja dla prowadzących (nazwa robocza)
+        </h2>
+      <Login/>
     </div>
   );
 }
