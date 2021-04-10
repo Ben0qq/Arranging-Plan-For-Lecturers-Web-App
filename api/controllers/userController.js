@@ -8,3 +8,4 @@ exports.getUser = base.getOne(User)
 // No password update!
 exports.updateUser = base.updateOne(User)
 exports.deleteUser = base.deleteOne(User)
+

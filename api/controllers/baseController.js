@@ -63,7 +63,8 @@ exports.updateOne = Model => async (req, res, next) => {
 
 exports.getOne = Model => async (req, res, next) => {
     try{
-        const doc = Model.findById(req.params.id)
+        const id = req.params.id
+        const doc = await Model.findById(id)
         if(!doc){
             return next(new AppError(404, 'fail', 'No document found with that id'),
             req,
@@ -85,16 +86,18 @@ exports.getOne = Model => async (req, res, next) => {
 
 exports.getAll = Model => async (req, res, next) => {
     try{
-        const features = new APIFeatures(Model.find(), req.query)
-        .sort()
-        .paginate()
+        // const features = new APIFeatures(Model.find(), req.query)
+        // .sort()
+        // .paginate()
 
-        const doc = await features.query
+        // const doc = await features.query
+        const doc = await Model.find()
+        
         res.status(200).json({
             status: 'success',
             results: doc.length,
             data: {
-                data: doc
+                doc
             }
         })
     } catch (err){

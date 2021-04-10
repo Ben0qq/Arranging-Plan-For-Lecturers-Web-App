@@ -16,7 +16,7 @@ exports.login = async (req, res, next) => {
         }
 
         // check whether user exists
-        const user = await User.find({ email }).select('+password')
+        const user = await User.findOne({ email: email }).select('+password')
         if(!user || !(await user.correctPassword(password, user.password))){
             return next(
                 new AppError(401, 'fail', 'Email or Password is wrong'),
@@ -45,7 +45,8 @@ exports.login = async (req, res, next) => {
 exports.signup = async (req, res, next) => {
     try{
         const user = await User.create({
-            firstName: req.body.name,
+            email: req.body.email,
+            firstName: req.body.firstName,
             lastName: req.body.lastName,
             password: req.body.password,
             role: req.body.role
@@ -69,6 +70,6 @@ exports.signup = async (req, res, next) => {
 const createToken = id => {
     return jwt.sign({ id },
         process.env.JWT_SECRET,
-        { expiresIN: process.env.JWT_EXPIRES_IN }
+        { expiresIn: process.env.JWT_EXPIRES_IN }
     )
 }
