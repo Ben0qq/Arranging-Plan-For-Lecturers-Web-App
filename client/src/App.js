@@ -1,31 +1,32 @@
-import React, { useState, useEffect } from 'react';
 import './App.css';
-import Login from './components/login';
+import Login from './components/Login';
+import { connect } from 'react-redux';
+import { getAppState } from './selectors/selectors';
 
-function App() {
-  const [setResponse] = useState({})
-
-  const fetchData = async() => {
-    fetch('/api/hello')
-      .then(res => res.json())
-      .then(res => {
-        setResponse(res)
-      })
-      .catch(err => console.log(err))
+const App = ({appState}) => {
+  if(appState ==='login'){
+    return (
+      <div className="App">
+          <h2>
+            Super aplikacja dla prowadzących (nazwa robocza)
+          </h2>
+        <Login/>
+      </div>
+    );
+  } else {
+    return(
+      <div className="App">
+            <h2>
+              Tu będą zapisywać się na zajęcia
+            </h2>
+        </div>
+    )
   }
-
-  useEffect(() => {
-    fetchData()
-  }, []);
-
-  return (
-    <div className="App">
-        <h2>
-          Super aplikacja dla prowadzących (nazwa robocza)
-        </h2>
-      <Login/>
-    </div>
-  );
 }
 
-export default App;
+const mapStateToProps = state => {
+  const appState = getAppState(state)
+  return {appState};
+}
+
+export default connect(mapStateToProps)(App);

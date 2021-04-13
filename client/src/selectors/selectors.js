@@ -1,0 +1,1 @@
+export const getAppState = (store) => store.appState
