@@ -3,20 +3,18 @@ const router = express.Router()
 const userController = require('../controllers/userController')
 const authController = require('../controllers/authController')
 
-// Auth POST
+// No authorization needed
 router.post('/login', authController.login);
 router.post('/signup', authController.signup);
 
 // Protect all routes after this middleware
-// router.use(authController.protect);
-
+router.use(authController.protect);
 
 // DELETE
 // router.delete('/deleteMe', userController.deleteMe);
 
-// Only admin have permission to access for the below APIs 
-// router.use(authController.restrictTo('admin'));
-
+// Restrict to admin only
+router.use(authController.restrictTo('admin'));
 router
     .route('/')
     .get(userController.getAllUsers);

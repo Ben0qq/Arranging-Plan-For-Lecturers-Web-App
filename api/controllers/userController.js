@@ -1,5 +1,4 @@
-  
-const User = require('../models/userModel');
+  const User = require('../models/userModel');
 const base = require('./baseController');
 
 exports.getAllUsers = base.getAll(User)

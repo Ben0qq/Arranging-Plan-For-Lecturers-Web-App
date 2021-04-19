@@ -67,6 +67,51 @@ exports.signup = async (req, res, next) => {
     }
 }
 
+exports.protect = async (req, res, next) => {
+    try{
+        // 1. Check whether token exists
+        let token
+        if(req.headers.authorization && req.headers.authorization('Bearer')){
+            token = req.headers.authorization.split(' ')[1]
+        }
+        if(!token){
+            return next(new AppError(401, 'fail', 'You are not logged in! Please login in to continue'),
+            req,
+            res,
+            next)
+        }
+
+        // 2. Verify token
+        const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
+
+        // 3. Check if user exists
+        const user = await User.findOne(decode.id)
+        if(!user){
+            return next(new AppError(401, 'fail', 'This user does not exist'),
+            req,
+            res,
+            next)
+        }
+
+        req.user = user
+        next()
+    } catch(err){
+        next(err)
+    }
+}
+
+exports.restrictTo = (...roles) => {
+    return (req, res, next) => {
+        if(!roles.includes(req.user.role)){
+            return next(new AppError(403, 'fail', 'Not authorized'),
+            req,
+            res,
+            next)
+        }
+        next()
+    }
+}
+
 const createToken = id => {
     return jwt.sign({ id },
         process.env.JWT_SECRET,
