@@ -1,4 +1,4 @@
 import { combineReducers } from "redux";
-import appState from "./appState";
+import getAppState from "./appState";
 
-export default combineReducers({ appState });
+export default combineReducers({ getAppState });

@@ -1,1 +1,1 @@
-export const getAppState = (store) => store.appState
+export const getAppState = store => store.appState
