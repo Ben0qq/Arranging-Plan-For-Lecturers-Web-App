@@ -1,9 +1,10 @@
 import './App.css';
-import Login from './components/Login';
-import { connect } from 'react-redux';
-import { getAppState } from './selectors/selectors';
+import {Login} from './components/Login';
+import { useSelector } from 'react-redux';
+import { getAppState } from './components/loginSlice';
 
-const App = ({appState}) => {
+function App() {
+  const appState = useSelector(getAppState);
   if(appState ==='login'){
     return (
       <div className="App">
@@ -24,9 +25,4 @@ const App = ({appState}) => {
   }
 }
 
-const mapStateToProps = state => {
-  const appState = getAppState(state)
-  return {appState};
-}
-
-export default connect(mapStateToProps)(App);
+export default App;
