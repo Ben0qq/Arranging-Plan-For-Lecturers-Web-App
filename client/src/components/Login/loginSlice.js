@@ -9,7 +9,6 @@ export const loginSlice = createSlice({
   initialState,
   reducers: {
 	setAppState: (state, action) => {
-	  console.log('johhnytest');
 	  state.appState = action.payload;
 	},
   },

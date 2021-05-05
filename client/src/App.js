@@ -1,13 +1,14 @@
 import './App.css';
-import {Login} from './components/Login';
+import {Login} from './components/Login/Login';
 import { useSelector } from 'react-redux';
-import { getAppState } from './components/loginSlice';
+import { getAppState } from './components/Login/loginSlice';
+import {Calendar} from './components/Calendar/Calendar';
 
 function App() {
   const appState = useSelector(getAppState);
   if(appState ==='login'){
     return (
-      <div className="App">
+      <div className="divLogin">
           <h2>
             Super aplikacja dla prowadzących (nazwa robocza)
           </h2>
@@ -16,11 +17,9 @@ function App() {
     );
   } else {
     return(
-      <div className="App">
-            <h2>
-              Tu będą zapisywać się na zajęcia
-            </h2>
-        </div>
+      <div className="divCalendar">
+            <Calendar></Calendar>
+      </div>
     )
   }
 }
