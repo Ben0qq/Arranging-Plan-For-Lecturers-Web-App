@@ -71,7 +71,7 @@ exports.protect = async (req, res, next) => {
     try{
         // 1. Check whether token exists
         let token
-        if(req.headers.authorization && req.headers.authorization('Bearer')){
+        if(req.headers.authorization){
             token = req.headers.authorization.split(' ')[1]
         }
         if(!token){
@@ -85,14 +85,13 @@ exports.protect = async (req, res, next) => {
         const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
 
         // 3. Check if user exists
-        const user = await User.findOne(decode.id)
+        const user = await User.findById(decode.id)
         if(!user){
             return next(new AppError(401, 'fail', 'This user does not exist'),
             req,
             res,
             next)
         }
-
         req.user = user
         next()
     } catch(err){

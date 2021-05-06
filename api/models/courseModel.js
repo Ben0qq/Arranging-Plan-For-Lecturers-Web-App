@@ -8,6 +8,12 @@ const courseSchema = new mongoose.Schema({
     courseShortName: {
         type: String
     },
+    type:{
+        type: String,
+        lowercase: true,
+        enum: ['lecture', 'exercises', 'lab', 'seminar'],
+        required: [true, 'Please fill type of course']
+    },
     dayOfCourse: {
         type: String,
         lowercase: true,
@@ -38,18 +44,26 @@ const courseSchema = new mongoose.Schema({
         max: 59,
         required: [true, 'Please end minute of course']
     },
-    guardian: {
-       id: {
-           type: Schema.Types.ObjectId, 
-           ref: 'userSchema'
-        }
+    // keeper: {
+    //    id: {
+    //        type: Schema.Types.ObjectId, 
+    //        ref: 'userSchema'
+    //     }
+    // },
+    // lecturer: {
+    //     id: {
+    //         type: Schema.Types.ObjectId, 
+    //         ref: 'userSchema'
+    //      }
+    //  },
+    keeperId: {
+        type: String,
+        required: false
     },
-    lecturer: {
-        id: {
-            type: Schema.Types.ObjectId, 
-            ref: 'userSchema'
-         }
-     },
+    lecturerId: {
+        type: String,
+        required: false
+    },
     description: {
         type: String,
         required: false

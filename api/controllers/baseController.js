@@ -13,7 +13,7 @@ exports.deleteOne = Model => async (req, res, next) => {
 
         res.status(204).json({
             status: 'success',
-            data: 'User has been deleted'
+            data: 'Model has been deleted'
         })
     } catch(err){
         next(err)
