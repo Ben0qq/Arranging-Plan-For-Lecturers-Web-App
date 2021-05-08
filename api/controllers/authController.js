@@ -6,7 +6,7 @@ const AppError = require("../utils/appError");
 exports.login = async (req, res, next) => {
     try{
         const { email, password } = req.body
-
+        console.log(req.body)
         // check whether email and password is given
         if(!email || !password){
             return next(new AppError(404, 'fail', 'Please provide email or password'),
