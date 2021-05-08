@@ -13,10 +13,11 @@ export const requestLogin = createAsyncThunk(
     'http://localhost:5000/api/users/login',
     {
       "email": login,
-      'password': password
+      "password": password
     }
   )
   setAppState('calendar');
+  console.log(response.data)
     return response.data;
   }
 )
