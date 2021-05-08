@@ -71,5 +71,6 @@ export const getAlertText = (state) => state.login.alertText
 
 export const getAlertOpen = (state) => state.login.alertOpen
 
+export const getStatus = (state) => state.login.status
 
 export default loginSlice.reducer;

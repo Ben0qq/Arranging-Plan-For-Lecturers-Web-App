@@ -2,14 +2,17 @@ import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
 import './Login.css';
 import { useDispatch, useSelector } from 'react-redux';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { 
     requestLogin,
+    getStatus
     } from './loginSlice';
 import React, { useState } from 'react';
 
 
 export function Login() {
     const dispatch = useDispatch();
+    const status = useSelector(getStatus)
     const [loginData, setLoginData] = useState({
         login: '',
         password: '',
@@ -34,7 +37,7 @@ export function Login() {
                 onChange={handleChange('password')}
             />
             <Button variant="contained" color="primary" onClick={() => dispatch(requestLogin(loginData))}>
-                Log in
+                {status ==='idle'?'Log in':<CircularProgress size={30} color='secondary'/>}
             </Button>
         </div>
     );

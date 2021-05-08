@@ -1,15 +1,20 @@
 import './Calendar.css';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button'
 import { makeStyles } from '@material-ui/core/styles';
+import Dialog from '@material-ui/core/Dialog';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { 
+    getDialogOpen,
+    setDialogOpen
+    } from './calendarSlice';
 
 const hours = ['7.30', '9.15', '11.15', '13.15', '15.15', '17.05', '18.55']
 const days = ['Mon', 'Tue', 'Wed', 'Thur', 'Fri'];
 var cardIndex = 0;
 
 const useStyles = makeStyles({
-    card: {
+    button: {
         margin: 5,
         width: 100,
         height: 100,
@@ -18,18 +23,16 @@ const useStyles = makeStyles({
 
 function CreateHour(props) {
     const classes = useStyles();
+    const dispatch = useDispatch();
+
     var day = [];
     for (let i = 0; i < 5; i++) {
         day.push(
             <div className='divCard'>
                 {i === 0 ? <h2>{props.hour}</h2> : <div></div>}
-                <Card className={classes.card} key={cardIndex}>
-                    <CardContent>
-                        <h4>
-                            johnytest
-                        </h4>
-                    </CardContent>
-                </Card>
+                <Button className={classes.button} key={cardIndex} variant='contained' color="primary" onClick={()=>dispatch(setDialogOpen(true))}>
+                    johnnytest
+                </Button>
             </div>
         )
     }
@@ -76,9 +79,16 @@ function CreateCalendar() {
 }
 
 export function Calendar() {
+    const open = useSelector(getDialogOpen)
+    const dispatch = useDispatch();
     return (
         <div className='calendarSpace'>
             {CreateCalendar()}
+            <Dialog onClose={() => dispatch(setDialogOpen(false))} open={open}>
+                <h4>
+                    johnnytest
+                </h4>
+            </Dialog>
         </div>
     )
 }
