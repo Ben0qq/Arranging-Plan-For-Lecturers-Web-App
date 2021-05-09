@@ -8,6 +8,7 @@ const initialState = {
   alertType: '',
   alertText: '',
   alertOpen: false,
+  token: '',
 };
 
 export const requestLogin = createAsyncThunk(
@@ -52,6 +53,7 @@ export const loginSlice = createSlice({
           state.alertType = 'success'
           state.alertText = 'Logged Successfully'
           state.alertOpen = true
+          state.token = action.payload.token
         }else{
           state.alertType = 'error'
           state.alertText = action.payload.message
@@ -68,6 +70,8 @@ export const getAppState = (state) => state.login.appState
 export const getAlertType = (state) => state.login.alertType
 
 export const getAlertText = (state) => state.login.alertText
+
+export const getToken = (state) => state.login.token
 
 export const getAlertOpen = (state) => state.login.alertOpen
 
