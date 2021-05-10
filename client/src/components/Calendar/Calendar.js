@@ -45,7 +45,9 @@ function CreateHour(props) {
     for (let i = 0; i < 5; i++) {
         day.push(
             <div className='divCard'>
-                {i === 0 ? <h2>{props.hour}</h2> : <div></div>}
+                <div className='divHourName'>
+                    {i === 0 && <h2>{props.hour}</h2>}
+                </div>
                 <Button
                     className={classes.button}
                     key={cardIndex}
@@ -105,14 +107,22 @@ function showDialog(courses, day, hour) {
         return returnValue
     })
     var listElements = []
-    filteredCourses.forEach(function(e){
+    if (filteredCourses.length === 0) {
         listElements.push(
-            <ListItem button>
-                {e.courseFullName}
+            <ListItem>
+                Brak kursów :(
             </ListItem>
         )
-    })
-    
+    } else {
+        filteredCourses.forEach(function (e) {
+            listElements.push(
+                <ListItem button>
+                    {e.courseFullName}
+                </ListItem>
+            )
+        })
+    }
+
     return listElements
 }
 
@@ -126,7 +136,7 @@ export function Calendar() {
 
     useEffect(() => {
         dispatch(requestAllCourses(token))
-    },[]);
+    }, []);
 
     return (
         <div className='calendarSpace'>
