@@ -1,0 +1,12 @@
+version: '2'
+services:
+    client:
+      build: ./client
+      ports:
+        - '3000:3000'
+      depends_on:
+        - api
+    api:
+      build: ./
+      ports:
+        - '5000:5000'
