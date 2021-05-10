@@ -127,7 +127,17 @@ function ShowDialog(props) {
         filteredCourses.forEach(function (e) {
             listElements.push(
                 <ListItem className={classes.dialog} button>
-                    {e.courseFullName}
+                    <div className='dialogList'>
+                        <div>
+                            {e.courseFullName}
+                        </div>
+                        <div>
+                            {"Keeper: "+e.keeper.firstName+' '+e.keeper.lastName}
+                        </div>
+                        <div>
+                        {e.description}
+                        </div>
+                    </div>
                 </ListItem>
             )
         })
