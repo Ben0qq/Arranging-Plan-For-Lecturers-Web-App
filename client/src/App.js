@@ -29,7 +29,7 @@ function App() {
     return (
       <div className="divLogin">
         <h2>
-          Super aplikacja dla prowadzących (nazwa robocza)
+          Super aplikacja dla prowadzących (nazwa mniej robocza)
           </h2>
         <Login />
         <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>

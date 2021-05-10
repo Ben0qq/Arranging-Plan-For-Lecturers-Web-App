@@ -28,6 +28,15 @@ const useStyles = makeStyles({
         margin: 5,
         width: 100,
         height: 100,
+    },
+    list:{
+        width: '80vh',
+        height: '80vh',
+    },
+    dialog:{
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
     }
 });
 
@@ -54,7 +63,6 @@ function CreateHour(props) {
                     variant='contained'
                     color="primary"
                     onClick={() => openDialog(props.hour, days[i].toLowerCase())}>
-                    johnnytest
                 </Button>
             </div>
         )
@@ -101,32 +109,34 @@ function CreateCalendar() {
     return calendar;
 }
 
-function showDialog(courses, day, hour) {
-    const filteredCourses = courses.filter(function (e) {
-        let returnValue = (e.dayOfCourse === day && e.startHour.toString() + '.' + e.startMinute.toString() === hour)
+function ShowDialog(props) {
+    const classes = useStyles();
+    console.log(props.courses)
+    const filteredCourses = props.courses.filter(function (e) {
+        let returnValue = (e.dayOfCourse === props.day && e.startHour.toString() + '.' + e.startMinute.toString() === props.hour)
         return returnValue
     })
     var listElements = []
     if (filteredCourses.length === 0) {
         listElements.push(
-            <ListItem>
+            <ListItem className={classes.dialog}>
                 Brak kursów :(
             </ListItem>
         )
     } else {
         filteredCourses.forEach(function (e) {
             listElements.push(
-                <ListItem button>
+                <ListItem className={classes.dialog} button>
                     {e.courseFullName}
                 </ListItem>
             )
         })
     }
-
     return listElements
 }
 
 export function Calendar() {
+    const classes = useStyles();
     const open = useSelector(getDialogOpen)
     const token = useSelector(getToken)
     const courses = useSelector(getCourses)
@@ -141,9 +151,12 @@ export function Calendar() {
     return (
         <div className='calendarSpace'>
             {CreateCalendar()}
-            <Dialog onClose={() => dispatch(setDialogOpen(false))} open={open}>
-                <List>
-                    {showDialog(courses, day, hour)}
+            <Dialog className={classes.dialog} onClose={() => dispatch(setDialogOpen(false))} open={open}>
+                <h2>Courses {day+' '+hour}</h2>
+                <List className={classes.list} >
+                    <ShowDialog courses={courses} day={day} hour={hour}>
+
+                    </ShowDialog>
                 </List>
             </Dialog>
         </div>
