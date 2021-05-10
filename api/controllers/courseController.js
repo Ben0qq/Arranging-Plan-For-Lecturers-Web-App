@@ -2,9 +2,45 @@ const Course = require('../models/courseModel');
 const User = require('../models/userModel');
 const base = require('./baseController');
 const AppError = require('../utils/appError');
+const { populate } = require('../models/userModel');
 
-exports.getAllCourses= base.getAll(Course)
-exports.getCourse= base.getOne(Course)
+exports.getAllCourses = async (req, res, next) => {
+    try{
+        const doc = await Course.find().populate('keeper').populate('lecturers')
+        res.status(200).json({
+            status: 'success',
+            results: doc.length,
+            data: {
+                doc
+            }
+        })
+    } catch (err){
+        next(err)
+    }
+}
+
+exports.getCourse = async (req, res, next) => {
+    try{
+        const id = req.params.id
+        const doc = await Course.findById(id).populate('keeper').populate('lecturers')
+        if(!doc){
+            return next(new AppError(404, 'fail', 'No document found with that id'),
+            req,
+            res,
+            next)
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: {
+                doc
+            }
+        })
+
+    } catch (err){
+        next(err)
+    }
+}
 
 exports.getCoursesByLecturer = async (req, res, next) => {
     try{
@@ -13,7 +49,7 @@ exports.getCoursesByLecturer = async (req, res, next) => {
             return next(new AppError(404, 'fail', 'No user (lecturer) found with that id'), req, res, next)
         }
 
-        const coursesByLecturer = await Course.find({ lecturerId: lecturer._id })
+        const coursesByLecturer = await Course.find({ lecturerId: lecturer._id }).populate('keeper').populate('lecturers')
 
         res.status(200).json({
              status: 'success',
@@ -30,7 +66,7 @@ exports.getCoursesByLecturer = async (req, res, next) => {
 
 exports.getCoursesByMissingLecturer = async (req, res, next) => {
     try{
-        const coursesByMissingLecturer = await Course.find({ lecturerId: undefined })
+        const coursesByMissingLecturer = await Course.find({ lecturerId: undefined }).populate('keeper').populate('lecturers')
 
         res.status(200).json({
              status: 'success',
@@ -52,7 +88,7 @@ exports.getCoursesByKeeper = async (req, res, next) => {
             return next(new AppError(404, 'fail', 'No user (keeper) found with that id'), req, res, next)
         }
 
-        const coursesByKeeper = await Course.find({ keeperId: keeper._id })
+        const coursesByKeeper = await Course.find({ keeperId: keeper._id }).populate('keeper').populate('lecturers')
 
         res.status(200).json({
              status: 'success',

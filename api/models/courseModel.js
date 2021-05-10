@@ -1,4 +1,5 @@
 const mongoose = require("mongoose"), Schema = mongoose.Schema
+const userModel = require('./userModel')
 
 const courseSchema = new mongoose.Schema({
     courseFullName: {
@@ -44,25 +45,13 @@ const courseSchema = new mongoose.Schema({
         max: 59,
         required: [true, 'Please end minute of course']
     },
-    // keeper: {
-    //    id: {
-    //        type: Schema.Types.ObjectId, 
-    //        ref: 'userSchema'
-    //     }
-    // },
-    // lecturer: {
-    //     id: {
-    //         type: Schema.Types.ObjectId, 
-    //         ref: 'userSchema'
-    //      }
-    //  },
-    keeperId: {
-        type: String,
-        required: false
-    },
-    lecturerId: {
-        type: String,
-        required: false
+    lecturers: [{
+        type: Schema.Types.ObjectId, 
+        ref: 'User',
+    }],
+    keeper: {
+        type: Schema.Types.ObjectId, 
+        ref: 'User',
     },
     description: {
         type: String,
