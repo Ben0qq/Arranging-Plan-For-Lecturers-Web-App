@@ -49,7 +49,7 @@ export const calendarSlice = createSlice({
         state.status = 'loading';
       })
       .addCase(requestAllCourses.fulfilled, (state, action) => {
-        state.courses = action.payload.data
+        state.courses = action.payload.data.doc
         state.status = 'idle';
       });
   },

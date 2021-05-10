@@ -51,7 +51,7 @@ function CreateHour(props) {
                     key={cardIndex}
                     variant='contained'
                     color="primary"
-                    onClick={openDialog(props.hour, days[i].toLowerCase())}>
+                    onClick={() => openDialog(props.hour, days[i].toLowerCase())}>
                     johnnytest
                 </Button>
             </div>
@@ -101,16 +101,18 @@ function CreateCalendar() {
 
 function showDialog(courses, day, hour) {
     const filteredCourses = courses.filter(function (e) {
-        return (e.dayOfCourse === day && e.startHour.toString() + '.' + e.startMinute.toString() === hour)
+        let returnValue = (e.dayOfCourse === day && e.startHour.toString() + '.' + e.startMinute.toString() === hour)
+        return returnValue
     })
     var listElements = []
-    for (const e in filteredCourses) {
+    filteredCourses.forEach(function(e){
         listElements.push(
             <ListItem button>
                 {e.courseFullName}
             </ListItem>
         )
-    }
+    })
+    
     return listElements
 }
 
@@ -124,7 +126,7 @@ export function Calendar() {
 
     useEffect(() => {
         dispatch(requestAllCourses(token))
-    });
+    },[]);
 
     return (
         <div className='calendarSpace'>
