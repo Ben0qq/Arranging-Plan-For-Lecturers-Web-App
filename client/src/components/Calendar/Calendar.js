@@ -5,9 +5,15 @@ import Dialog from '@material-ui/core/Dialog';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getToken } from '../Login/loginSlice';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
+import Card from '@material-ui/core/Card';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import IconButton from '@material-ui/core/IconButton';
+import AddIcon from '@material-ui/icons/Add';
+import Tooltip from '@material-ui/core/Tooltip';
+
 import {
     getDialogOpen,
     setDialogOpen,
@@ -26,29 +32,45 @@ var cardIndex = 0;
 const useStyles = makeStyles({
     button: {
         margin: 5,
-        width: 100,
-        height: 100,
+        width: '15vh',
+        height: '15vh',
+        fontSize: '26px',
     },
-    list:{
+    list: {
         width: '80vh',
         height: '80vh',
     },
-    dialog:{
+    dialog: {
+        margin: 15,
         textAlign: 'center',
         alignItems: 'center',
         justifyContent: 'center',
-    }
+    },
+    cardActions: {
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 });
 
 function CreateHour(props) {
     const classes = useStyles();
     const dispatch = useDispatch();
     var day = [];
+    const courses = useSelector(getCourses)
 
     const openDialog = (hour, day) => {
         dispatch(setDay(day))
         dispatch(setHour(hour))
         dispatch(setDialogOpen(true))
+    }
+
+    const getNumberOfCourses = (i, hour) => {
+        const filteredCourses = courses.filter(function (e) {
+            let returnValue = (e.dayOfCourse === days[i].toLowerCase() && e.startHour.toString() + '.' + e.startMinute.toString() === hour)
+            return returnValue
+        })
+        return filteredCourses.length.toString();
     }
 
     for (let i = 0; i < 5; i++) {
@@ -63,6 +85,7 @@ function CreateHour(props) {
                     variant='contained'
                     color="primary"
                     onClick={() => openDialog(props.hour, days[i].toLowerCase())}>
+                    {getNumberOfCourses(i, props.hour)}
                 </Button>
             </div>
         )
@@ -88,7 +111,15 @@ function CreateDays() {
     return day;
 }
 
-function CreateCalendar() {
+function CreateCalendar(props) {
+    const classes = useStyles();
+    const dispatch = useDispatch();
+    const courses = useSelector(getCourses)
+
+    const openDialog = () => {
+        dispatch(setDay('none'))
+        dispatch(setDialogOpen(true))
+    }
     var calendar = [];
     calendar.push(
         <div className='daysRow'>
@@ -106,39 +137,82 @@ function CreateCalendar() {
             </div>
         )
     }
+
+    const getNumberOfCourses = () => {
+        const filteredCourses = courses.filter(function (e) {
+            let returnValue = (!(hours.includes(e.startHour.toString() + '.' + e.startMinute.toString())))
+            return returnValue
+        })
+        return filteredCourses.length.toString();
+    }
+
+    calendar.push(
+        <div className='divOtherHours'>
+            <div className='divHourName'>
+                <h2>Other hours</h2>
+            </div>
+            <Button
+                className={classes.button}
+                key={cardIndex}
+                variant='contained'
+                color="primary"
+                onClick={() => openDialog()}>
+                {getNumberOfCourses()}
+            </Button>
+        </div>
+    )
     return calendar;
 }
 
 function ShowDialog(props) {
     const classes = useStyles();
     console.log(props.courses)
-    const filteredCourses = props.courses.filter(function (e) {
-        let returnValue = (e.dayOfCourse === props.day && e.startHour.toString() + '.' + e.startMinute.toString() === props.hour)
-        return returnValue
-    })
+    var filteredCourses = []
+    if (props.day === 'none') {
+        filteredCourses = props.courses.filter(function (e) {
+            let returnValue = (!(hours.includes(e.startHour.toString() + '.' + e.startMinute.toString())))
+            return returnValue
+        })
+    } else {
+        filteredCourses = props.courses.filter(function (e) {
+            let returnValue = (e.dayOfCourse === props.day && e.startHour.toString() + '.' + e.startMinute.toString() === props.hour)
+            return returnValue
+        })
+    }
     var listElements = []
     if (filteredCourses.length === 0) {
         listElements.push(
-            <ListItem className={classes.dialog}>
-                Brak kursów :(
-            </ListItem>
+            <Card className={classes.dialog}>
+                <CardContent>
+                    Brak kursów :(
+                </CardContent>
+            </Card>
         )
     } else {
         filteredCourses.forEach(function (e) {
             listElements.push(
-                <ListItem className={classes.dialog} button>
-                    <div className='dialogList'>
-                        <div>
-                            {e.courseFullName}
+                <Card className={classes.dialog} variant="outlined">
+                    <CardContent>
+                        <div className='dialogList'>
+                            <div>
+                                {e.courseFullName}
+                            </div>
+                            <div>
+                                {"Keeper: " + e.keeper.firstName + ' ' + e.keeper.lastName}
+                            </div>
+                            <div>
+                                {e.description}
+                            </div>
                         </div>
-                        <div>
-                            {"Keeper: "+e.keeper.firstName+' '+e.keeper.lastName}
-                        </div>
-                        <div>
-                        {e.description}
-                        </div>
-                    </div>
-                </ListItem>
+                    </CardContent>
+                    <CardActions className={classes.cardActions}>
+                        <Tooltip title="I want to teach that!">
+                            <IconButton >
+                                <AddIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </CardActions>
+                </Card>
             )
         })
     }
@@ -162,12 +236,12 @@ export function Calendar() {
         <div className='calendarSpace'>
             {CreateCalendar()}
             <Dialog className={classes.dialog} onClose={() => dispatch(setDialogOpen(false))} open={open}>
-                <h2>Courses {day+' '+hour}</h2>
-                <List className={classes.list} >
+                <div className={classes.list}>
+                    <h2>{day !== 'none' ? `Courses ${day} ${hour}` : 'Irregular hours courses'}</h2>
                     <ShowDialog courses={courses} day={day} hour={hour}>
 
                     </ShowDialog>
-                </List>
+                </div>
             </Dialog>
         </div>
     )

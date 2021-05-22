@@ -1,6 +1,8 @@
 .divLogin {
   text-align: center;
   background-color: grey;
+  min-width: 100vw;
+  overflow: visible;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -11,6 +13,8 @@
 .divCalendar {
   text-align: center;
   background-color: grey;
+  min-width: 100vw;
+  overflow: visible;
   min-height: 100vh;
   display: flex;
   flex-direction: row;
