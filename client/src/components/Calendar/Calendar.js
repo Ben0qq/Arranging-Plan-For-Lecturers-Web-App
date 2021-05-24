@@ -207,7 +207,7 @@ function ShowDialog(props) {
                     </CardContent>
                     <CardActions className={classes.cardActions}>
                         <Tooltip title="I want to teach that!">
-                            <IconButton >
+                            <IconButton onClick{}>
                                 <AddIcon />
                             </IconButton>
                         </Tooltip>

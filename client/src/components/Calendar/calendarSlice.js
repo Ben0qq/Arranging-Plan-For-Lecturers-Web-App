@@ -29,6 +29,26 @@ export const requestAllCourses = createAsyncThunk(
   }
 )
 
+export const teachCourse = createAsyncThunk(
+  'calendar/teachOne',
+  async (data) => {
+    try {
+      const response = await axios.get(
+        'http://localhost:5000/api/courses/',
+        {
+          headers:{
+            'Authorization': 'Bearer ' + data
+          }
+        }
+      )   
+      return response.data;
+    } catch (error) {
+      console.log(error.response.data)
+      return(error.response.data)
+    }
+  }
+)
+
 export const calendarSlice = createSlice({
   name: 'calendar',
   initialState,
