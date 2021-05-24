@@ -12,7 +12,7 @@ const courseSchema = new mongoose.Schema({
     type:{
         type: String,
         lowercase: true,
-        enum: ['lecture', 'exercises', 'lab', 'seminar'],
+        enum: ['lecture', 'exercises', 'lab', 'seminar', 'project'],
         required: [true, 'Please fill type of course']
     },
     dayOfCourse: {
@@ -20,6 +20,12 @@ const courseSchema = new mongoose.Schema({
         lowercase: true,
         enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'],
         required: [true, 'Please fill day of course']
+    },
+    parity: {
+        type: String,
+        lowercase: true,
+        enum: ['tn', 'tp', 'all'],
+        default: 'all'
     },
     startHour: {
         type: Number,
@@ -47,12 +53,16 @@ const courseSchema = new mongoose.Schema({
     },
     lecturers: [{
         type: Schema.Types.ObjectId, 
-        ref: 'User',
+        ref: 'User'
     }],
     keeper: {
         type: Schema.Types.ObjectId, 
-        ref: 'User',
+        ref: 'User'
     },
+    contenders: [{
+        type: Schema.Types.ObjectId, 
+        ref: 'User'
+    }],
     description: {
         type: String,
         required: false
