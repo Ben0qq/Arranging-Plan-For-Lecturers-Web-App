@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-
 const initialState = {
   dialogOpen: false,
   status: 'idle',
   courses: [],
   day: '',
   hour: '',
+  currentCourses:[],
+  coursesChanged: 0
 };
 
 export const requestAllCourses = createAsyncThunk(
@@ -20,7 +21,7 @@ export const requestAllCourses = createAsyncThunk(
             'Authorization': 'Bearer ' + data
           }
         }
-      )   
+      ) 
       return response.data;
     } catch (error) {
       console.log(error.response.data)
@@ -33,14 +34,37 @@ export const teachCourse = createAsyncThunk(
   'calendar/teachOne',
   async (data) => {
     try {
-      const response = await axios.get(
-        'http://localhost:5000/api/courses/',
+      const response = await axios.patch(
+        'http://localhost:5000/api/courses/'+data.course._id,
+        data.course,
         {
           headers:{
-            'Authorization': 'Bearer ' + data
+            'Authorization': 'Bearer ' + data.token
           }
         }
       )   
+      return response.data;
+    } catch (error) {
+      console.log(error.response.data)
+      return(error.response.data)
+    }
+  }
+)
+
+export const dontTeachCourse = createAsyncThunk(
+  'calendar/dontTeachOne',
+  async (data) => {
+    try {
+
+      const response = await axios.patch(
+        'http://localhost:5000/api/courses/'+data.course._id,
+        data.course,
+        {
+          headers:{
+            'Authorization': 'Bearer ' + data.token
+          }
+        }
+      )  
       return response.data;
     } catch (error) {
       console.log(error.response.data)
@@ -71,6 +95,16 @@ export const calendarSlice = createSlice({
       .addCase(requestAllCourses.fulfilled, (state, action) => {
         state.courses = action.payload.data.doc
         state.status = 'idle';
+      })
+      .addCase(teachCourse.fulfilled, (state)=>{
+        let box = state.coursesChanged
+        box = box+1
+        state.coursesChanged = box;
+      })
+      .addCase(dontTeachCourse.fulfilled, (state)=>{
+        let box = state.coursesChanged
+        box = box+1
+        state.coursesChanged = box;
       });
   },
 });
@@ -80,6 +114,8 @@ export const { setDialogOpen, setDay, setHour } = calendarSlice.actions;
 export const getDialogOpen = (state) => state.calendar.dialogOpen
 
 export const getDay = (state) => state.calendar.day
+
+export const getCoursesChanged = (state) => state.calendar.coursesChanged
 
 export const getHour = (state) => state.calendar.hour
 

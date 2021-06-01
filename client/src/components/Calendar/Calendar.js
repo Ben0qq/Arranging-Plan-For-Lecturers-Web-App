@@ -4,16 +4,16 @@ import { makeStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getToken } from '../Login/loginSlice';
+import { getLoginResponse } from '../Login/loginSlice';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import IconButton from '@material-ui/core/IconButton';
+import CheckIcon from '@material-ui/icons/Check';
 import AddIcon from '@material-ui/icons/Add';
 import Tooltip from '@material-ui/core/Tooltip';
-
 import {
     getDialogOpen,
     setDialogOpen,
@@ -23,6 +23,9 @@ import {
     getCourses,
     getDay,
     getHour,
+    teachCourse,
+    dontTeachCourse,
+    getCoursesChanged
 } from './calendarSlice';
 
 const hours = ['7.30', '9.15', '11.15', '13.15', '15.15', '17.05', '18.55']
@@ -164,9 +167,18 @@ function CreateCalendar(props) {
     return calendar;
 }
 
+function createLecturers(course, loginData, add){
+    let lecturers = course.lecturers;
+    if(!add) lecturers =  lecturers>1 ? lecturers.splice(lecturers.map(function (f) { return f._id }).indexOf(loginData.data.user._id),1) : []
+    else lecturers.push(loginData.data.user)
+    course.lecturers = lecturers
+    return course
+}
+
 function ShowDialog(props) {
     const classes = useStyles();
-    console.log(props.courses)
+    const dispatch = useDispatch();
+    var _ = require('lodash');
     var filteredCourses = []
     if (props.day === 'none') {
         filteredCourses = props.courses.filter(function (e) {
@@ -190,6 +202,7 @@ function ShowDialog(props) {
         )
     } else {
         filteredCourses.forEach(function (e) {
+            var objectToSend = _.cloneDeep(e)
             listElements.push(
                 <Card className={classes.dialog} variant="outlined">
                     <CardContent>
@@ -206,11 +219,27 @@ function ShowDialog(props) {
                         </div>
                     </CardContent>
                     <CardActions className={classes.cardActions}>
-                        <Tooltip title="I want to teach that!">
-                            <IconButton onClick{}>
-                                <AddIcon />
-                            </IconButton>
-                        </Tooltip>
+                        {e.lecturers.map(function (f) { return f._id }).indexOf(props.loginResponse.data.user._id) === -1 ?
+                            <Tooltip title="I want to teach that!">
+                                <IconButton onClick={() => dispatch(teachCourse(
+                                    {
+                                        token: props.loginResponse.token,
+                                        course: createLecturers(objectToSend, props.loginResponse, true)
+                                    }
+                                ))}>
+                                    <AddIcon />
+                                </IconButton>
+                            </Tooltip> :
+                            <Tooltip title="I don't want to teach that!">
+                                <IconButton onClick={() => dispatch(dontTeachCourse(
+                                    {
+                                        token: props.loginResponse.token,
+                                        course: createLecturers(objectToSend, props.loginResponse, false)
+                                    }
+                                ))}>
+                                    <CheckIcon />
+                                </IconButton>
+                            </Tooltip>}
                     </CardActions>
                 </Card>
             )
@@ -222,23 +251,23 @@ function ShowDialog(props) {
 export function Calendar() {
     const classes = useStyles();
     const open = useSelector(getDialogOpen)
-    const token = useSelector(getToken)
+    const loginResponse = useSelector(getLoginResponse)
     const courses = useSelector(getCourses)
+    const coursesChanged = useSelector(getCoursesChanged)
     const day = useSelector(getDay)
     const hour = useSelector(getHour)
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(requestAllCourses(token))
-    }, []);
-
+        dispatch(requestAllCourses(loginResponse.token))
+    }, [coursesChanged]);
     return (
         <div className='calendarSpace'>
             {CreateCalendar()}
             <Dialog className={classes.dialog} onClose={() => dispatch(setDialogOpen(false))} open={open}>
                 <div className={classes.list}>
                     <h2>{day !== 'none' ? `Courses ${day} ${hour}` : 'Irregular hours courses'}</h2>
-                    <ShowDialog courses={courses} day={day} hour={hour}>
+                    <ShowDialog courses={courses} day={day} hour={hour} loginResponse={loginResponse}>
 
                     </ShowDialog>
                 </div>
