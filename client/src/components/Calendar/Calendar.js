@@ -167,11 +167,11 @@ function CreateCalendar(props) {
     return calendar;
 }
 
-function createLecturers(course, loginData, add){
-    let lecturers = course.lecturers;
-    if(!add) lecturers =  lecturers>1 ? lecturers.splice(lecturers.map(function (f) { return f._id }).indexOf(loginData.data.user._id),1) : []
-    else lecturers.push(loginData.data.user)
-    course.lecturers = lecturers
+function createContenders(course, loginData, add){
+    let contenders = course.contenders;
+    if(!add) contenders =  contenders>1 ? contenders.splice(contenders.map(function (f) { return f._id }).indexOf(loginData.data.user._id),1) : []
+    else contenders.push(loginData.data.user)
+    course.contenders = contenders
     return course
 }
 
@@ -219,12 +219,12 @@ function ShowDialog(props) {
                         </div>
                     </CardContent>
                     <CardActions className={classes.cardActions}>
-                        {e.lecturers.map(function (f) { return f._id }).indexOf(props.loginResponse.data.user._id) === -1 ?
+                        {e.contenders.map(function (f) { return f._id }).indexOf(props.loginResponse.data.user._id) === -1 ?
                             <Tooltip title="I want to teach that!">
                                 <IconButton onClick={() => dispatch(teachCourse(
                                     {
                                         token: props.loginResponse.token,
-                                        course: createLecturers(objectToSend, props.loginResponse, true)
+                                        course: createContenders(objectToSend, props.loginResponse, true)
                                     }
                                 ))}>
                                     <AddIcon />
@@ -234,7 +234,7 @@ function ShowDialog(props) {
                                 <IconButton onClick={() => dispatch(dontTeachCourse(
                                     {
                                         token: props.loginResponse.token,
-                                        course: createLecturers(objectToSend, props.loginResponse, false)
+                                        course: createContenders(objectToSend, props.loginResponse, false)
                                     }
                                 ))}>
                                     <CheckIcon />
@@ -261,6 +261,7 @@ export function Calendar() {
     useEffect(() => {
         dispatch(requestAllCourses(loginResponse.token))
     }, [coursesChanged]);
+    console.log(courses)
     return (
         <div className='calendarSpace'>
             {CreateCalendar()}

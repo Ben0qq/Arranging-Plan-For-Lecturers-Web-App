@@ -34,6 +34,7 @@ export const teachCourse = createAsyncThunk(
   'calendar/teachOne',
   async (data) => {
     try {
+      console.log(data.course)
       const response = await axios.patch(
         'http://localhost:5000/api/courses/'+data.course._id,
         data.course,
