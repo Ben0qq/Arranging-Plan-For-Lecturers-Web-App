@@ -6,7 +6,7 @@ const { populate } = require('../models/userModel');
 
 exports.getAllCourses = async (req, res, next) => {
     try{
-        const doc = await Course.find().populate('keeper').populate('lecturers')
+        const doc = await Course.find().populate('keeper').populate('lecturers').populate('contenders')
         res.status(200).json({
             status: 'success',
             results: doc.length,
@@ -22,7 +22,7 @@ exports.getAllCourses = async (req, res, next) => {
 exports.getCourse = async (req, res, next) => {
     try{
         const id = req.params.id
-        const doc = await Course.findById(id).populate('keeper').populate('lecturers')
+        const doc = await Course.findById(id).populate('keeper').populate('lecturers').populate('contenders')
         if(!doc){
             return next(new AppError(404, 'fail', 'No document found with that id'),
             req,
@@ -49,7 +49,7 @@ exports.getCoursesByLecturer = async (req, res, next) => {
             return next(new AppError(404, 'fail', 'No user (lecturer) found with that id'), req, res, next)
         }
 
-        const coursesByLecturer = await Course.find({ lecturerId: lecturer._id }).populate('keeper').populate('lecturers')
+        const coursesByLecturer = await Course.find({ lecturerId: lecturer._id }).populate('keeper').populate('lecturers').populate('contenders')
 
         res.status(200).json({
              status: 'success',
@@ -66,7 +66,7 @@ exports.getCoursesByLecturer = async (req, res, next) => {
 
 exports.getCoursesByMissingLecturer = async (req, res, next) => {
     try{
-        const coursesByMissingLecturer = await Course.find({ lecturerId: undefined }).populate('keeper').populate('lecturers')
+        const coursesByMissingLecturer = await Course.find({ lecturerId: undefined }).populate('keeper').populate('lecturers').populate('contenders')
 
         res.status(200).json({
              status: 'success',
@@ -88,7 +88,7 @@ exports.getCoursesByKeeper = async (req, res, next) => {
             return next(new AppError(404, 'fail', 'No user (keeper) found with that id'), req, res, next)
         }
 
-        const coursesByKeeper = await Course.find({ keeperId: keeper._id }).populate('keeper').populate('lecturers')
+        const coursesByKeeper = await Course.find({ keeperId: keeper._id }).populate('keeper').populate('lecturers').populate('contenders')
 
         res.status(200).json({
              status: 'success',
