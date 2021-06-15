@@ -13,6 +13,8 @@ import { Calendar } from './components/Calendar/Calendar';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import { AdminPanel } from './components/AdminPanel/AdminPanel';
+import React from 'react';
+
 function App() {
   const appState = useSelector(getAppState);
   const alertType = useSelector(getAlertType);

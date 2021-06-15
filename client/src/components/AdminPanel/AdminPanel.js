@@ -279,10 +279,10 @@ export function AdminPanel() {
             <Dialog onClose={() => dispatch(setDialogAddCourseOpen(false))} open={courseOpen}>
                 <div className={classes.dialog}>
                     <FormControl component="fieldset">
-                        <FormLabel component="legend">Choose course parameters</FormLabel>
+                        <FormLabel className={classes.button} component="legend">Choose course parameters</FormLabel>
                         <TextField label="Course Full Name" value={fullNameValue} onChange={handleFullNameChange}></TextField>
                         <TextField label="Course Short Name" value={shortNameValue} onChange={handleShortNameChange}></TextField>
-                        <FormLabel component="legend">Day of the Week</FormLabel>
+                        <FormLabel className={classes.button} component="legend">Day of the Week</FormLabel>
                         <RadioGroup name="weekType" value={weekValue} onChange={handleWeekChange}>
                             <FormControlLabel value="monday" control={<Radio />} label="Monday" />
                             <FormControlLabel value="tuesday" control={<Radio />} label="Tuesday" />
@@ -295,23 +295,25 @@ export function AdminPanel() {
                         <TextField label="Description" value={descriptionValue} onChange={handleDescriptionChange}></TextField>
                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
                             <KeyboardTimePicker
+                                className={classes.button}
                                 label="Start Hour"
                                 value={startHourValue}
                                 onChange={handleStartHourChange}
                             />
                             <KeyboardTimePicker
+                                className={classes.button}
                                 label="Start Hour"
                                 value={endHourValue}
                                 onChange={handleEndHourChange}
                             />
                         </MuiPickersUtilsProvider>
-                        <FormLabel component="legend">Parity</FormLabel>
+                        <FormLabel className={classes.button} component="legend">Parity</FormLabel>
                         <RadioGroup name="parity" value={parityValue} onChange={handleParityChange}>
                             <FormControlLabel value="all" control={<Radio />} label="Both weeks" />
                             <FormControlLabel value="tp" control={<Radio />} label="Odd weeks" />
                             <FormControlLabel value="tn" control={<Radio />} label="Even weeks" />
                         </RadioGroup>
-                        <FormLabel component="legend">Course Type</FormLabel>
+                        <FormLabel className={classes.button} component="legend">Course Type</FormLabel>
                         <RadioGroup name="courseType" value={courseTypeValue} onChange={handleCourseTypeChange}>
                             <FormControlLabel value="seminar" control={<Radio />} label="Seminar" />
                             <FormControlLabel value="lecture" control={<Radio />} label="Lecture" />
@@ -319,7 +321,7 @@ export function AdminPanel() {
                             <FormControlLabel value="project" control={<Radio />} label="Project" />
                             <FormControlLabel value="exercises" control={<Radio />} label="Exercises" />
                         </RadioGroup>
-                        <FormLabel component="legend">Select keeper</FormLabel>
+                        <FormLabel className={classes.button} component="legend">Select keeper</FormLabel>
                         <Select value={keeperValue} onChange={handleKeeperChange}>
                             {users.map((user) => (
                                 <MenuItem value={user}>{user.firstName + " " + user.lastName}</MenuItem>
