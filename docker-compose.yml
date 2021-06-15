@@ -1,6 +1,7 @@
-version: '2'
+version: '2.2'
 services:
-    client:
+    client: 
+      stdin_open: true
       build: ./client
       ports:
         - '3000:3000'

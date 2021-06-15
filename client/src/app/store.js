@@ -1,8 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
+import loginReducer from '../components/Login/loginSlice'
+import calendarReducer from '../components/Calendar/calendarSlice'
+import adminPanelReducer from '../components/AdminPanel/adminPanelSlice';
 
-export default configureStore({
+export const store = configureStore({
   reducer: {
-    counter: counterReducer,
+    login: loginReducer,
+    calendar: calendarReducer,
+    adminPanel: adminPanelReducer
   },
 });

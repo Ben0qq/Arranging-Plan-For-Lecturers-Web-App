@@ -1,76 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
 import './App.css';
+import { Login } from './components/Login/Login';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  getAppState,
+  getAlertType,
+  setAlertOpen,
+  getAlertText,
+  getAlertOpen,
+  getLoginResponse
+} from './components/Login/loginSlice';
+import { Calendar } from './components/Calendar/Calendar';
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
+import { AdminPanel } from './components/AdminPanel/AdminPanel';
+import React from 'react';
 
 function App() {
-  const [responseFromApi, setResponse] = useState({})
+  const appState = useSelector(getAppState);
+  const alertType = useSelector(getAlertType);
+  const alertText = useSelector(getAlertText);
+  const alertOpen = useSelector(getAlertOpen);
+  const loginResponse = useSelector(getLoginResponse)
+  const dispatch = useDispatch();
 
-  const fetchData = async() => {
-    fetch('/api/hello')
-      .then(res => res.json())
-      .then(res => {
-        setResponse(res)
-      })
-      .catch(err => console.log(err))
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    dispatch(setAlertOpen(false))
+  };
+
+  if (appState === 'login') {
+    return (
+      <div className="divLogin">
+        <h2>
+          Super aplikacja dla prowadzących
+          </h2>
+        <Login />
+        <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity={alertType === "success" ? "success" : "error"}>
+            {alertText}
+          </Alert>
+        </Snackbar>
+      </div>
+    );
+  } else {
+    if (loginResponse.data.user.role === 'admin') {
+      return (
+        <div className="divCalendar">
+          <AdminPanel />
+          <Calendar />
+          <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>
+            <Alert onClose={handleClose} severity={alertType === "success" ? "success" : "error"}>
+              {alertText}
+            </Alert>
+          </Snackbar>
+        </div>
+      )
+    } else {
+      console.log(loginResponse)
+      return (
+        <div className="divCalendarUser">
+          <Calendar />
+          <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>
+            <Alert onClose={handleClose} severity={alertType === "success" ? "success" : "error"}>
+              {alertText}
+            </Alert>
+          </Snackbar>
+        </div>
+      )
+    }
   }
-
-  useEffect(() => {
-    fetchData()
-  }, []);
-
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-          </a>
-        </span>
-        <a style={{ fontSize: 24 }}>
-        Msg from API: <span style={{ color: 'red' }}>{responseFromApi.header}</span>
-        </a>
-      </header>
-
-    </div>
-  );
 }
 
 export default App;
