@@ -13,7 +13,6 @@ import { Calendar } from './components/Calendar/Calendar';
 import Snackbar from '@material-ui/core/Snackbar';
 import Alert from '@material-ui/lab/Alert';
 import { AdminPanel } from './components/AdminPanel/AdminPanel';
-
 function App() {
   const appState = useSelector(getAppState);
   const alertType = useSelector(getAlertType);
@@ -33,7 +32,7 @@ function App() {
     return (
       <div className="divLogin">
         <h2>
-          Super aplikacja dla prowadzących (nazwa mniej robocza)
+          Super aplikacja dla prowadzących
           </h2>
         <Login />
         <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>
@@ -59,7 +58,7 @@ function App() {
     } else {
       console.log(loginResponse)
       return (
-        <div className="divCalendar">
+        <div className="divCalendarUser">
           <Calendar />
           <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleClose}>
             <Alert onClose={handleClose} severity={alertType === "success" ? "success" : "error"}>

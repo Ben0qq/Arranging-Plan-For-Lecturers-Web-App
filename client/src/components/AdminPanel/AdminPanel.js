@@ -16,6 +16,9 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
+import { makeStyles } from '@material-ui/core/styles';
+import Tooltip from '@material-ui/core/Tooltip';
+
 import {
     requestAllUsers,
     getUsers,
@@ -45,7 +48,31 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import TextField from '@material-ui/core/TextField';
 import { getHours, getMinutes } from 'date-fns';
 
-function AddUser(props) {
+
+const useStyles = makeStyles({
+    paper: {
+        backgroundColor: 'blue'
+    },
+    dialog: {
+        padding: '10px',
+        margin: '10px',
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    dialogDiv: {
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    button: {
+        margin: '10px',
+        padding: '10px'
+    }
+});
+
+
+export function AddUser(props) {
     const [value, setValue] = React.useState('normal');
     const [firstNameValue, setFirstNameValue] = React.useState('');
     const [lastNameValue, setLastNameValue] = React.useState('');
@@ -81,12 +108,14 @@ function AddUser(props) {
             <TextField label="First Name" id="first-name" value={firstNameValue} onChange={handleFirstNameChange}></TextField>
             <TextField label="Last Name" id="last-name" value={lastNameValue} onChange={handleLastNameChange}></TextField>
             <TextField label="Email" id="email" value={emailValue} onChange={handleEmailChange}></TextField>
-            <TextField type='password' label="password" id="password" value={passwordValue} onChange={handlePasswordChange}></TextField>
+            <TextField type='password' label="Password" id="password" value={passwordValue} onChange={handlePasswordChange}></TextField>
             <FormLabel component="legend">Role</FormLabel>
+            {props.loginResponse?
             <RadioGroup aria-label="gender" name="gender1" value={value} onChange={handleValueChange}>
                 <FormControlLabel value="admin" control={<Radio />} label="Admin" />
                 <FormControlLabel value="normal" control={<Radio />} label="User" />
-            </RadioGroup>
+            </RadioGroup> :''
+            }
             <Button onClick={() => dispatch(addUser({
                 name: firstNameValue,
                 name2: lastNameValue,
@@ -101,6 +130,7 @@ function AddUser(props) {
 function Users(props) {
     const open = useSelector(getDialogAddUserOpen)
     const dispatch = useDispatch();
+    const classes = useStyles();
 
     let rows = props.users.map(function (x) {
         let name = x.firstName
@@ -111,7 +141,7 @@ function Users(props) {
         return { name, name2, email, role, id }
     })
     return (
-        <div>
+        <div className={classes.dialogDiv}>
             <TableContainer >
                 <Table >
                     <TableHead>
@@ -140,15 +170,19 @@ function Users(props) {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Button onClick={() => dispatch(setDialogAddUserOpen(true))}>
-                <AddIcon>
+            <Tooltip title="Add user">
+                <Button className={classes.button} onClick={() => dispatch(setDialogAddUserOpen(true))}>
+                    <AddIcon>
 
-                </AddIcon>
-            </Button>
+                    </AddIcon>
+                </Button>
+            </Tooltip>
             <Dialog onClose={() => dispatch(setDialogAddUserOpen(false))} open={open}>
-                <AddUser>
+                <div className={classes.dialog}>
+                    <AddUser loginResponse={props.loginResponse}>
 
-                </AddUser>
+                    </AddUser>
+                </div>
             </Dialog>
         </div>
     )
@@ -156,7 +190,7 @@ function Users(props) {
 
 export function AdminPanel() {
 
-
+    const classes = useStyles();
     const [menuOpen, setMenuOpen] = useState(false)
     const users = useSelector(getUsers)
     const open = useSelector(getDialogUsersOpen)
@@ -226,7 +260,7 @@ export function AdminPanel() {
             <h4>
                 Panel Admina
             </h4>
-            <Drawer anchor={"left"} open={menuOpen} onClose={() => setMenuOpen(false)}>
+            <Drawer className={{ paper: classes.paper }} anchor={"left"} open={menuOpen} onClose={() => setMenuOpen(false)}>
                 <div
                     role="presentation"
                     onClick={() => setMenuOpen(false)}
@@ -243,72 +277,74 @@ export function AdminPanel() {
                 </div>
             </Drawer>
             <Dialog onClose={() => dispatch(setDialogAddCourseOpen(false))} open={courseOpen}>
-                <FormControl component="fieldset">
-                    <FormLabel component="legend">Choose course parameters</FormLabel>
-                    <TextField label="Course Full Name" value={fullNameValue} onChange={handleFullNameChange}></TextField>
-                    <TextField label="Course Short Name" value={shortNameValue} onChange={handleShortNameChange}></TextField>
-                    <FormLabel component="legend">Day of the Week</FormLabel>
-                    <RadioGroup name="weekType" value={weekValue} onChange={handleWeekChange}>
-                        <FormControlLabel value="monday" control={<Radio />} label="Monday" />
-                        <FormControlLabel value="tuesday" control={<Radio />} label="Tuesday" />
-                        <FormControlLabel value="wednesday" control={<Radio />} label="Wednesday" />
-                        <FormControlLabel value="thursday" control={<Radio />} label="Thursday" />
-                        <FormControlLabel value="friday" control={<Radio />} label="Friday" />
-                        <FormControlLabel value="saturday" control={<Radio />} label="Saturday" />
-                        <FormControlLabel value="sunday" control={<Radio />} label="Sunday" />
-                    </RadioGroup>
-                    <TextField label="Description" value={descriptionValue} onChange={handleDescriptionChange}></TextField>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <KeyboardTimePicker
-                            label="Start Hour"
-                            value={startHourValue}
-                            onChange={handleStartHourChange}
-                        />
-                        <KeyboardTimePicker
-                            label="Start Hour"
-                            value={endHourValue}
-                            onChange={handleEndHourChange}
-                        />
-                    </MuiPickersUtilsProvider>
-                    <FormLabel component="legend">Parity</FormLabel>
-                    <RadioGroup name="parity" value={parityValue} onChange={handleParityChange}>
-                        <FormControlLabel value="all" control={<Radio />} label="Both weeks" />
-                        <FormControlLabel value="tp" control={<Radio />} label="Odd weeks" />
-                        <FormControlLabel value="tn" control={<Radio />} label="Even weeks" />
-                    </RadioGroup>
-                    <FormLabel component="legend">Course Type</FormLabel>
-                    <RadioGroup name="courseType" value={courseTypeValue} onChange={handleCourseTypeChange}>
-                        <FormControlLabel value="seminar" control={<Radio />} label="Seminar" />
-                        <FormControlLabel value="lecture" control={<Radio />} label="Lecture" />
-                        <FormControlLabel value="lab" control={<Radio />} label="Lab" />
-                        <FormControlLabel value="project" control={<Radio />} label="Project" />
-                        <FormControlLabel value="exercises" control={<Radio />} label="Exercises" />
-                    </RadioGroup>
-                    <FormLabel component="legend">Select keeper</FormLabel>
-                    <Select value={keeperValue} onChange={handleKeeperChange}>
-                        {users.map((user)=>(
-                            <MenuItem value={user}>{user.firstName+" "+user.lastName}</MenuItem>
-                        ))}
-                    </Select>
-                    <Button onClick={() => dispatch(addCourse({
-                        course: {
-                            contenders: [],
-                            courseFullName: fullNameValue,
-                            courseShortName: shortNameValue,
-                            dayOfCourse: weekValue,
-                            description: descriptionValue,
-                            keeper: keeperValue,
-                            lecturers: [],
-                            parity: parityValue,
-                            type: courseTypeValue,
-                            startHour: getHours(startHourValue),
-                            endHour: getHours(endHourValue),
-                            startMinute: getMinutes(startHourValue),
-                            endMinute: getMinutes(endHourValue)
-                        },
-                        token: loginResponse.token
-                    }))}>Create Course</Button>
-                </FormControl>
+                <div className={classes.dialog}>
+                    <FormControl component="fieldset">
+                        <FormLabel component="legend">Choose course parameters</FormLabel>
+                        <TextField label="Course Full Name" value={fullNameValue} onChange={handleFullNameChange}></TextField>
+                        <TextField label="Course Short Name" value={shortNameValue} onChange={handleShortNameChange}></TextField>
+                        <FormLabel component="legend">Day of the Week</FormLabel>
+                        <RadioGroup name="weekType" value={weekValue} onChange={handleWeekChange}>
+                            <FormControlLabel value="monday" control={<Radio />} label="Monday" />
+                            <FormControlLabel value="tuesday" control={<Radio />} label="Tuesday" />
+                            <FormControlLabel value="wednesday" control={<Radio />} label="Wednesday" />
+                            <FormControlLabel value="thursday" control={<Radio />} label="Thursday" />
+                            <FormControlLabel value="friday" control={<Radio />} label="Friday" />
+                            <FormControlLabel value="saturday" control={<Radio />} label="Saturday" />
+                            <FormControlLabel value="sunday" control={<Radio />} label="Sunday" />
+                        </RadioGroup>
+                        <TextField label="Description" value={descriptionValue} onChange={handleDescriptionChange}></TextField>
+                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                            <KeyboardTimePicker
+                                label="Start Hour"
+                                value={startHourValue}
+                                onChange={handleStartHourChange}
+                            />
+                            <KeyboardTimePicker
+                                label="Start Hour"
+                                value={endHourValue}
+                                onChange={handleEndHourChange}
+                            />
+                        </MuiPickersUtilsProvider>
+                        <FormLabel component="legend">Parity</FormLabel>
+                        <RadioGroup name="parity" value={parityValue} onChange={handleParityChange}>
+                            <FormControlLabel value="all" control={<Radio />} label="Both weeks" />
+                            <FormControlLabel value="tp" control={<Radio />} label="Odd weeks" />
+                            <FormControlLabel value="tn" control={<Radio />} label="Even weeks" />
+                        </RadioGroup>
+                        <FormLabel component="legend">Course Type</FormLabel>
+                        <RadioGroup name="courseType" value={courseTypeValue} onChange={handleCourseTypeChange}>
+                            <FormControlLabel value="seminar" control={<Radio />} label="Seminar" />
+                            <FormControlLabel value="lecture" control={<Radio />} label="Lecture" />
+                            <FormControlLabel value="lab" control={<Radio />} label="Lab" />
+                            <FormControlLabel value="project" control={<Radio />} label="Project" />
+                            <FormControlLabel value="exercises" control={<Radio />} label="Exercises" />
+                        </RadioGroup>
+                        <FormLabel component="legend">Select keeper</FormLabel>
+                        <Select value={keeperValue} onChange={handleKeeperChange}>
+                            {users.map((user) => (
+                                <MenuItem value={user}>{user.firstName + " " + user.lastName}</MenuItem>
+                            ))}
+                        </Select>
+                        <Button onClick={() => dispatch(addCourse({
+                            course: {
+                                contenders: [],
+                                courseFullName: fullNameValue,
+                                courseShortName: shortNameValue,
+                                dayOfCourse: weekValue,
+                                description: descriptionValue,
+                                keeper: keeperValue,
+                                lecturers: [],
+                                parity: parityValue,
+                                type: courseTypeValue,
+                                startHour: getHours(startHourValue),
+                                endHour: getHours(endHourValue),
+                                startMinute: getMinutes(startHourValue),
+                                endMinute: getMinutes(endHourValue)
+                            },
+                            token: loginResponse.token
+                        }))}>Create Course</Button>
+                    </FormControl>
+                </div>
             </Dialog>
             <Dialog onClose={() => dispatch(setDialogUsersOpen(false))} open={open}>
                 <div>

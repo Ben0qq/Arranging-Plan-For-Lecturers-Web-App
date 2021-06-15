@@ -3,16 +3,48 @@ import Input from '@material-ui/core/Input';
 import './Login.css';
 import { useDispatch, useSelector } from 'react-redux';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { 
+import {
     requestLogin,
     getStatus
-    } from './loginSlice';
+} from './loginSlice';
 import React, { useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Dialog from '@material-ui/core/Dialog';
 
+import { setDialogAddUserOpen, getDialogAddUserOpen } from '../AdminPanel/adminPanelSlice'
+import { AddUser } from '../AdminPanel/AdminPanel';
+
+const useStyles = makeStyles({
+    paper: {
+        backgroundColor: 'blue'
+    },
+    dialog: {
+        padding: '10px',
+        margin: '10px',
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    dialogDiv: {
+        textAlign: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    button: {
+        margin: '10px',
+        padding: '10px'
+    },
+    buttons:{
+        flexDirection: 'row'
+    }
+});
 
 export function Login() {
+    const classes = useStyles();
+
     const dispatch = useDispatch();
     const status = useSelector(getStatus)
+    const open = useSelector(getDialogAddUserOpen)
     const [loginData, setLoginData] = useState({
         login: '',
         password: '',
@@ -36,9 +68,21 @@ export function Login() {
                 inputProps={{ 'aria-label': 'password field' }}
                 onChange={handleChange('password')}
             />
-            <Button variant="contained" color="primary" onClick={() => dispatch(requestLogin(loginData))}>
-                {status ==='idle'?'Log in':<CircularProgress size={30} color='secondary'/>}
+            <div className={classes.buttons}>
+            <Button className={classes.button} variant="contained" color="primary" onClick={() => dispatch(requestLogin(loginData))}>
+                {status === 'idle' ? 'Log in' : <CircularProgress size={30} color='secondary' />}
             </Button>
+            <Button className={classes.button} variant="contained" color="primary" onClick={() => dispatch(setDialogAddUserOpen(true))}>
+                Signup
+            </Button>
+            </div>
+            <Dialog onClose={() => dispatch(setDialogAddUserOpen(false))} open={open}>
+                <div className={classes.dialog}>
+                    <AddUser>
+
+                    </AddUser>
+                </div>
+            </Dialog>
         </div>
     );
 }
