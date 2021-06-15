@@ -53,7 +53,6 @@ export const loginSlice = createSlice({
           state.alertText = 'Logged Successfully'
           state.alertOpen = true
           state.loginResponse = action.payload
-          console.log(state.loginResponse)
         }else{
           state.alertType = 'error'
           state.alertText = action.payload.message

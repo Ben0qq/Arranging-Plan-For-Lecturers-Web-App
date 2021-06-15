@@ -7,7 +7,11 @@ const initialState = {
   day: '',
   hour: '',
   currentCourses:[],
-  coursesChanged: 0
+  coursesChanged: 0,
+  lecturerDialogOpen: {
+    open: false,
+    course: {}
+  }
 };
 
 export const requestAllCourses = createAsyncThunk(
@@ -34,7 +38,6 @@ export const teachCourse = createAsyncThunk(
   'calendar/teachOne',
   async (data) => {
     try {
-      console.log(data.course)
       const response = await axios.patch(
         'http://localhost:5000/api/courses/'+data.course._id,
         data.course,
@@ -74,6 +77,27 @@ export const dontTeachCourse = createAsyncThunk(
   }
 )
 
+export const removeCourse = createAsyncThunk(
+  'adminPanel/removeCourse',
+  async (data) => {
+      try {
+          const response = await axios.delete(
+              'http://localhost:5000/api/courses/'+data._id,
+              {
+                  headers: {
+                      'Authorization': 'Bearer ' + data.token
+                  }
+              }
+          )
+          return response.data;
+      } catch (error) {
+          console.log(error.response.data)
+          return (error.response.data)
+      }
+  }
+)
+
+
 export const calendarSlice = createSlice({
   name: 'calendar',
   initialState,
@@ -86,6 +110,9 @@ export const calendarSlice = createSlice({
     },
     setDay: (state, action) => {
       state.day = action.payload;
+    },
+    setLecturerDialogOpen: (state, action) => {
+      state.lecturerDialogOpen = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -106,13 +133,20 @@ export const calendarSlice = createSlice({
         let box = state.coursesChanged
         box = box+1
         state.coursesChanged = box;
+      })
+      .addCase(removeCourse.fulfilled, (state)=>{
+        let box = state.coursesChanged
+        box = box+1
+        state.coursesChanged = box;
       });
   },
 });
 
-export const { setDialogOpen, setDay, setHour } = calendarSlice.actions;
+export const { setDialogOpen, setDay, setHour, setLecturerDialogOpen } = calendarSlice.actions;
 
 export const getDialogOpen = (state) => state.calendar.dialogOpen
+
+export const getLecturerDialogOpen = (state) => state.calendar.lecturerDialogOpen
 
 export const getDay = (state) => state.calendar.day
 

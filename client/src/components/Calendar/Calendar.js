@@ -11,9 +11,18 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import IconButton from '@material-ui/core/IconButton';
-import CheckIcon from '@material-ui/icons/Check';
 import AddIcon from '@material-ui/icons/Add';
 import Tooltip from '@material-ui/core/Tooltip';
+import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import PeopleIcon from '@material-ui/icons/People';
+import CheckIcon from '@material-ui/icons/Check';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Table from '@material-ui/core/Table';
+
 import {
     getDialogOpen,
     setDialogOpen,
@@ -25,9 +34,12 @@ import {
     getHour,
     teachCourse,
     dontTeachCourse,
-    getCoursesChanged
+    getCoursesChanged,
+    removeCourse,
+    getLecturerDialogOpen,
+    setLecturerDialogOpen
 } from './calendarSlice';
-
+import { getDialogUsersOpen, getReloadCourses, setDialogUsersOpen } from '../AdminPanel/adminPanelSlice'
 const hours = ['7.30', '9.15', '11.15', '13.15', '15.15', '17.05', '18.55']
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 var cardIndex = 0;
@@ -68,7 +80,7 @@ function CreateHour(props) {
         dispatch(setDialogOpen(true))
     }
 
-    const getNumberOfCourses = (i, hour) => {
+    const getNumberOfCourses2 = (i, hour) => {
         const filteredCourses = courses.filter(function (e) {
             let returnValue = (e.dayOfCourse === days[i].toLowerCase() && e.startHour.toString() + '.' + e.startMinute.toString() === hour)
             return returnValue
@@ -88,7 +100,7 @@ function CreateHour(props) {
                     variant='contained'
                     color="primary"
                     onClick={() => openDialog(props.hour, days[i].toLowerCase())}>
-                    {getNumberOfCourses(i, props.hour)}
+                    {getNumberOfCourses2(i, props.hour)}
                 </Button>
             </div>
         )
@@ -167,10 +179,20 @@ function CreateCalendar(props) {
     return calendar;
 }
 
-function createContenders(course, loginData, add){
+function createContenders(course, loginData, add) {
     let contenders = course.contenders;
-    if(!add) contenders =  contenders>1 ? contenders.splice(contenders.map(function (f) { return f._id }).indexOf(loginData.data.user._id),1) : []
-    else contenders.push(loginData.data.user)
+    if (!add && contenders.length > 1 ) contenders.splice(contenders.map(function (f) { return f._id }).indexOf(loginData.data.user._id), 1)
+    else if (!add) contenders = []
+    if (add) contenders.push(loginData.data.user)
+    course.contenders = contenders
+    return course
+}
+
+function createLecturers(course, user, add) {
+    let contenders = course.contenders;
+    if(contenders.length > 1) contenders.splice(contenders.map(function (f) { return f._id }).indexOf(user._id), 1)
+    else contenders = [] 
+    if (add && !course.lecturers.find(x=>x._id === user._id)) course.lecturers.push(user)
     course.contenders = contenders
     return course
 }
@@ -178,6 +200,7 @@ function createContenders(course, loginData, add){
 function ShowDialog(props) {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const openUsers = useSelector(getLecturerDialogOpen) 
     var _ = require('lodash');
     var filteredCourses = []
     if (props.day === 'none') {
@@ -202,6 +225,8 @@ function ShowDialog(props) {
         )
     } else {
         filteredCourses.forEach(function (e) {
+            console.log(e, openUsers)
+           
             var objectToSend = _.cloneDeep(e)
             listElements.push(
                 <Card className={classes.dialog} variant="outlined">
@@ -215,6 +240,10 @@ function ShowDialog(props) {
                             </div>
                             <div>
                                 {e.description}
+                            </div>
+                            <div>
+                                {"Lecturers: "}
+                                {e.lecturers.map(function(f) {return f.firstName+" "+f.lastName})}
                             </div>
                         </div>
                     </CardContent>
@@ -240,6 +269,67 @@ function ShowDialog(props) {
                                     <CheckIcon />
                                 </IconButton>
                             </Tooltip>}
+                        {props.loginResponse.data.user.role === 'admin' ?
+                            <Tooltip title="Remove course">
+                                <IconButton onClick={() => dispatch(removeCourse(
+                                    {
+                                        token: props.loginResponse.token,
+                                        _id: e._id
+                                    }
+                                ))}>
+                                    <RemoveCircleIcon />
+                                </IconButton>
+                            </Tooltip>
+                            : ''}
+                        {_.isEqual(props.loginResponse.data.user, e.keeper) || props.loginResponse.data.user.role === 'admin' ?
+                            <div>
+                                <Tooltip title="Check who wants to teach">
+                                    <IconButton onClick={() => dispatch(setLecturerDialogOpen({open: true, course: e}))}>
+                                        <PeopleIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Dialog onClose={() => dispatch(setLecturerDialogOpen(false))} open={openUsers.open&&(_.isEqual(e, openUsers.course))}>
+                                    <TableContainer >
+                                        <Table >
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell align="right">Accept</TableCell>
+                                                    <TableCell align="right">Deny</TableCell>
+                                                    <TableCell align="right">First Name</TableCell>
+                                                    <TableCell align="right">Last Name</TableCell>
+                                                    <TableCell align="right">E-mail</TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {e.contenders.map((row) => (
+                                                    <TableRow>
+                                                        <TableCell>
+                                                            <Button onClick={() => dispatch(teachCourse({
+                                                                course: createLecturers(objectToSend,row , true),
+                                                                token: props.loginResponse.token
+                                                            }))}>
+                                                                <CheckIcon />
+                                                            </Button>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <Button onClick={() => dispatch(teachCourse({
+                                                                course: createLecturers(objectToSend,row, false),
+                                                                token: props.loginResponse.token
+                                                            }))}>
+                                                                <RemoveCircleIcon />
+                                                            </Button>
+                                                        </TableCell>
+                                                        <TableCell align="right">{row.firstName}</TableCell>
+                                                        <TableCell align="right">{row.lastName}</TableCell>
+                                                        <TableCell align="right">{row.email}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </Dialog>
+                            </div>
+                            : <div>why</div>}
                     </CardActions>
                 </Card>
             )
@@ -256,12 +346,13 @@ export function Calendar() {
     const coursesChanged = useSelector(getCoursesChanged)
     const day = useSelector(getDay)
     const hour = useSelector(getHour)
+    const reloadCourses = useSelector(getReloadCourses)
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(requestAllCourses(loginResponse.token))
-    }, [coursesChanged]);
-    console.log(courses)
+    }, [coursesChanged, reloadCourses]);
+
     return (
         <div className='calendarSpace'>
             {CreateCalendar()}
